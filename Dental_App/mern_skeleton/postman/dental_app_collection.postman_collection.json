@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "Dental App API",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "Collection for backend endpoints: auth, patients, treatments, appointments, users",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register (Dentist)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\":\"alice\",\"name\":\"Alice Dent\",\"email\":\"alice@test.com\",\"password\":\"Password1\",\"role\":\"dentist\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [ "{{baseUrl}}" ],
+          "path": [ "api", "auth", "register" ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save created user id as dentistId",
+              "try {",
+              "  var json = pm.response.json();",
+              "  if (json && json.user && json.user._id) {",
+              "    pm.environment.set('dentistId', json.user._id);",
+              "    console.log('dentistId saved:', json.user._id);",
+              "  } else {",
+              "    console.log('No user._id in register response');",
+              "  }",
+              "} catch (e) { console.log('Register response not JSON or other error', e); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"usernameOrEmail\":\"alice\",\"password\":\"Password1\"}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save JWT token to environment variable 'token' (prefix with 'Bearer ' for Authorization header)",
+              "try {",
+              "  var json = pm.response.json();",
+              "  if (json && json.token) {",
+              "    pm.environment.set('token', 'Bearer ' + json.token);",
+              "    console.log('Token saved to environment variable token');",
+              "  } else {",
+              "    console.log('No token in login response');",
+              "  }",
+              "} catch (e) { console.log('Login response not JSON or other error', e); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Patient",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"dob\":\"1990-01-01\",\"phone\":\"1234567890\",\"medicalHistory\":\"None\"}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/patients", "host": ["{{baseUrl}}"], "path": ["api","patients"] }
+      }
+      ,
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save created patient id",
+              "try {",
+              "  var json = pm.response.json();",
+              "  if (json && json._id) {",
+              "    pm.environment.set('patientId', json._id);",
+              "    console.log('patientId saved:', json._id);",
+              "  } else {",
+              "    console.log('No _id in create patient response');",
+              "  }",
+              "} catch (e) { console.log('Create Patient response not JSON or other error', e); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Treatment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"code\":\"T100\",\"name\":\"Cleaning\",\"description\":\"Teeth cleaning\",\"price\":80,\"durationMins\":30}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/treatments", "host": ["{{baseUrl}}"], "path": ["api","treatments"] }
+      }
+      ,
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save created treatment id",
+              "try {",
+              "  var json = pm.response.json();",
+              "  if (json && json._id) {",
+              "    pm.environment.set('treatmentId', json._id);",
+              "    console.log('treatmentId saved:', json._id);",
+              "  } else {",
+              "    console.log('No _id in create treatment response');",
+              "  }",
+              "} catch (e) { console.log('Create Treatment response not JSON or other error', e); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Appointment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"patient\":\"{{patientId}}\",\"dentist\":\"{{dentistId}}\",\"treatments\":[\"{{treatmentId}}\"],\"startAt\":\"2025-11-25T10:00:00.000Z\"}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/appointments", "host": ["{{baseUrl}}"], "path": ["api","appointments"] }
+      }
+      ,
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save created appointment id",
+              "try {",
+              "  var json = pm.response.json();",
+              "  if (json && json._id) {",
+              "    pm.environment.set('appointmentId', json._id);",
+              "    console.log('appointmentId saved:', json._id);",
+              "  } else {",
+              "    console.log('No _id in create appointment response');",
+              "  }",
+              "} catch (e) { console.log('Create Appointment response not JSON or other error', e); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Appointments",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "{{token}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/appointments", "host": ["{{baseUrl}}"], "path": ["api","appointments"] }
+      }
+    },
+    {
+      "name": "List Users",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "{{token}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api","users"] }
+      }
+    }
+  ]
+}
