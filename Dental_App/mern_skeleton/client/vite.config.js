@@ -20,8 +20,21 @@ export default defineConfig({
   build: {
     manifest: true,
     outDir: "./dist",
+    minify: "terser",
+    sourcemap: false,
     rollupOptions: {
       input: "./index.html",
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'mui': ['@mui/material', '@mui/icons-material'],
+        },
+      },
     },
+  },
+  
+  // Performance optimizations
+  define: {
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
   },
 });
